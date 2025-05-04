@@ -9,7 +9,8 @@ import com.furia.fanprofiler.models.Fan;
 
 @Repository
 public interface FanRepository extends JpaRepository<Fan, UUID> {
-    
+
     Fan findByCpf(String cpf);
+
     Fan findByEmail(String email);
 }

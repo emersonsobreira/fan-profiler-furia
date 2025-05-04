@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.furia.fanprofiler.dtos.SocialMediaProfile;
 import com.furia.fanprofiler.models.Fan;
 import com.furia.fanprofiler.repositories.FanRepository;
-
 
 @RestController
 @RequestMapping("/fans")
@@ -36,7 +36,6 @@ public class FanController {
 
     private final FanRepository fanRepository;
 
-    
     public FanController(FanRepository fanRepository) {
         this.fanRepository = fanRepository;
     }
@@ -60,7 +59,6 @@ public class FanController {
             if (!file.getContentType().equals("application/pdf")) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Somente arquivos PDF são permitidos.");
             }
-
 
             String uploadDir = "uploads";
             Files.createDirectories(Paths.get(uploadDir));
@@ -102,32 +100,29 @@ public class FanController {
     }
 
     @GetMapping("/{id}/download")
-public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
-    Fan fan = fanRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fan não encontrado"));
+    public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
+        Fan fan = fanRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fan não encontrado"));
 
-    try {
-        Path filePath = Path.of(fan.getDocumentPath());
-        Resource resource = new UrlResource(filePath.toUri());
+        try {
+            Path filePath = Path.of(fan.getDocumentPath());
+            Resource resource = new UrlResource(filePath.toUri());
 
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Arquivo não pode ser lido");
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Arquivo não pode ser lido");
+            }
+
+            String fileName = filePath.getFileName().toString();
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .body(resource);
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao carregar o arquivo", e);
         }
-
-        String fileName = filePath.getFileName().toString();
-
-        return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_PDF)
-        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-        .body(resource);
-    
-
-    } catch (IOException e) {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao carregar o arquivo", e);
     }
-}
-
-
 
     @PutMapping("/{id}")
     public Fan updateFan(@PathVariable UUID id, @RequestBody Fan updatedFan) {
@@ -138,6 +133,24 @@ public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
             fan.setAddress(updatedFan.getAddress());
             return fanRepository.save(fan);
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fan not found"));
+    }
+
+    @PutMapping("/{id}/socials")
+    public Fan updateSocials(@PathVariable UUID id, @RequestBody SocialMediaProfile socialMediaProfile) {
+        Fan fan = fanRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fan not found"));
+
+        fan.setInstagram(socialMediaProfile.getInstagram());
+        fan.setTwitter(socialMediaProfile.getTwitter());
+        fan.setTwitch(socialMediaProfile.getTwitch());
+
+        fan.setInterests(socialMediaProfile.getInterests());
+        fan.setEvents(socialMediaProfile.getEvents());
+        fan.setPurchases(socialMediaProfile.getPurchases());
+        fan.setSocialLinks(socialMediaProfile.getSocialLinks());
+        fan.setEsportsProfiles(socialMediaProfile.getEsportsProfiles());
+
+        return fanRepository.save(fan);
     }
 
     @DeleteMapping("/{id}")
