@@ -1,51 +1,23 @@
-package com.furia.fanprofiler.models;
+package com.furia.fanprofiler.dtos;
 
 import java.util.List;
-import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-
-@Entity
-public class Fan {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+public class FanRequestDTO {
 
     private String name;
     private String cpf;
     private String email;
     private String address;
-
-    @Column(length = 1000)
     private String aiAnalysisResult;
-
     private String documentPath;
 
-    @ElementCollection
     private List<String> interests;
-
-    @ElementCollection
     private List<String> events;
-
-    @ElementCollection
     private List<String> purchases;
-
-    @ElementCollection
     private List<String> socialLinks;
-
-    @ElementCollection
     private List<String> esportsProfiles;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private SocialMediaProfile socialMediaProfile;
+    private SocialMediaProfileDTO socialMediaProfile;
 
     public String getName() {
         return name;
@@ -135,19 +107,12 @@ public class Fan {
         this.esportsProfiles = esportsProfiles;
     }
 
-    public SocialMediaProfile getSocialMediaProfile() {
+    public SocialMediaProfileDTO getSocialMediaProfile() {
         return socialMediaProfile;
     }
 
-    public void setSocialMediaProfile(SocialMediaProfile socialMediaProfile) {
+    public void setSocialMediaProfile(SocialMediaProfileDTO socialMediaProfile) {
         this.socialMediaProfile = socialMediaProfile;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 }

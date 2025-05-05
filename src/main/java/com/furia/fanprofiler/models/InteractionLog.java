@@ -1,4 +1,4 @@
-package com.furia.fanprofiler.models;
+/*package com.furia.fanprofiler.models;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,9 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import lombok.Data;
 
-@Data
 @Entity
 public class InteractionLog {
 
@@ -35,3 +33,4 @@ public class InteractionLog {
     }
 
 }
+*/
